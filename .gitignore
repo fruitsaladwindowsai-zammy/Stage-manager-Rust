@@ -1,0 +1,14 @@
+# Rust build outputs & release packaging
+/target/
+/dist/
+
+# Logs & temporary files
+*.log
+*.tmp
+smoke_err.txt
+
+# Editor & OS artifacts
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
