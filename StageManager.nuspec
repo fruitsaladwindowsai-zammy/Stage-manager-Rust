@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>StageManager.Windows</id>
+    <version>0.1.0</version>
+    <title>Stage Manager for Windows</title>
+    <authors>fruitsaladwindowsai-zammy</authors>
+    <owners>fruitsaladwindowsai-zammy</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust</projectUrl>
+    <description>A native, lightweight macOS-style Stage Manager for Windows 10 and Windows 11 written in Rust using DWM Thumbnails, Direct2D, and spring physics.</description>
+    <summary>Native macOS-style Stage Manager for Windows 10 &amp; 11</summary>
+    <releaseNotes>v0.1.0 Initial release with DWM live previews, spring physics, auto-hide, infinite scroll, group fan-out, multi-monitor support, and virtual desktop isolation.</releaseNotes>
+    <copyright>Copyright (c) 2026</copyright>
+    <tags>windows stage-manager multitasking rust dwm direct2d desktop-enhancement</tags>
+    <readme>docs\README.md</readme>
+  </metadata>
+  <files>
+    <file src="dist\stage_manager.exe" target="tools\" />
+    <file src="dist\StageManagerSetup.exe" target="tools\" />
+    <file src="README.md" target="docs\README.md" />
+    <file src="LICENSE" target="LICENSE" />
+  </files>
+</package>

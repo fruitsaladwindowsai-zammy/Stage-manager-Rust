@@ -1,6 +1,8 @@
 # Rust build outputs & release packaging
 /target/
 /dist/
+*.nupkg
+nuget.exe
 
 # Logs & temporary files
 *.log
