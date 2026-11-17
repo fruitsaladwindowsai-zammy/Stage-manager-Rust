@@ -1,113 +1,191 @@
-[![CI](../../actions/workflows/release.yml/badge.svg)](../../actions/workflows/release.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) ![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue) ![Language: Rust](https://img.shields.io/badge/Language-Rust-orange)
+<p align="center">
+  <img src="assets/demo/how-it-works.svg" alt="Stage Manager for Windows Demo" width="100%" />
+</p>
 
-# Stage Manager for Windows
+<p align="center">
+  <a href="../../actions/workflows/release.yml"><img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square&logo=github-actions" alt="Build Status" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT" /></a>
+  <a href="https://www.microsoft.com/windows"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue?style=flat-square&logo=windows" alt="Platform: Windows" /></a>
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Language-Rust-orange?style=flat-square&logo=rust" alt="Language: Rust" /></a>
+  <a href="../../releases/latest"><img src="https://img.shields.io/badge/Release-v0.1.0-blueviolet?style=flat-square" alt="Latest Release" /></a>
+</p>
 
-A native, lightweight **macOS-style Stage Manager** for Windows 10 & Windows 11 written in Rust using the Windows Desktop Window Manager (DWM) Thumbnail API, Direct2D/DirectWrite, and VSync-paced spring physics.
+<h1 align="center">Stage Manager for Windows</h1>
 
-Runs silently as a **Windows system tray app**, supports **multiple monitors**, isolates **Windows Virtual Desktops**, and can launch automatically on **Windows boot**.
+<p align="center">
+  <strong>A native, ultra-lightweight macOS-style Stage Manager for Windows 10 &amp; 11 written in Rust.</strong><br>
+  Real-time GPU previews via DWM, 60/120Hz VSync spring physics, multi-monitor isolation, and virtual desktop integration — with zero Electron or screenshot polling overhead.
+</p>
 
-## 📸 Screenshots / Demo
-
-> 📸 *Screenshots and GIF demos coming soon — contributions welcome!*
+<p align="center">
+  <a href="#-quickstart-clone--run-in-60-seconds">Quickstart</a> •
+  <a href="#-screenshots">Screenshots</a> •
+  <a href="#-features">Features</a> •
+  <a href="#-how-it-works">How It Works</a> •
+  <a href="#-controls--shortcuts">Shortcuts</a> •
+  <a href="#-documentation">Docs</a>
+</p>
 
 ---
 
-## Features
+## ⚡ Quickstart: Clone & Run in 60 Seconds
 
-- **Live GPU Window Previews (`DwmRegisterThumbnail`)** — Real-time rounded-corner thumbnails without polling screenshots.
-- **Auto-Hide & Smooth Spring Physics** — Slips off-screen when unused and glides smoothly out when your cursor reaches the left/right screen edge (or corner).
-- **macOS Curved Ribbon Wave & Infinite Carousel** — Hovered stage pops toward you while neighbors curve gently inward; rests at the top or bottom edge scroll smoothly and wrap indefinitely in both directions.
-- **Grouped App Hover Expansion** — Multi-window app groups fan out cleanly horizontally when hovered so every window in the group is visible and individually clickable.
-- **Per-Monitor Independent Views** — Spawns an independent Stage Manager strip and trigger zone on **every connected monitor** (with per-monitor DPI scaling and hotplug support), managing only windows on that display.
-- **Virtual Desktop Isolation** — Tracks and isolates workspaces per **Windows Virtual Desktop** (`Win+Ctrl+D`, `Win+Tab`); switching to a new virtual desktop starts a fresh workspace without disturbing prior desktops.
-- **System Tray & Windows Boot Startup** — Right-click the tray icon to configure side edge, trigger mode, backdrop, grouping, or toggle **Run at Windows Startup**.
-- **Standalone Windows Installer (`StageManagerSetup.exe`)** — One-click install to `%LOCALAPPDATA%\StageManager`, Start Menu shortcut, Windows Installed Apps uninstaller, and automatic boot startup.
+Anyone with Windows 10 or 11 can clone and run Stage Manager immediately.
+
+### 1. Prerequisites (Skip if you already have Git and Rust)
+Open **PowerShell** and run:
+```powershell
+winget install --id Git.Git -e --source winget; winget install --id Rustlang.Rustup -e --source winget
+```
+*(Restart PowerShell after install so `git` and `cargo` are available in your path)*
+
+### 2. Clone & Run
+```powershell
+# Clone the repository
+git clone https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust.git
+cd Stage-manager-Rust
+
+# Run immediately in release mode
+cargo run --release
+```
+
+Move your cursor to the **left edge of your screen** — Stage Manager slides out instantly!
+
+### 3. Build & Install Permanently (Optional)
+To create the standalone Windows installer and install Stage Manager into your Start Menu and Windows startup:
+```powershell
+# Build application and installer
+cargo build --release --bin stage_manager
+$env:STAGE_MANAGER_EMBED_PATH = "target\release\stage_manager.exe"
+cargo build --release --bin StageManagerSetup
+
+# Run installer
+.\target\release\StageManagerSetup.exe
+```
+
+> Prefer a prebuilt executable? Grab **`StageManagerSetup.exe`** directly from the [**Releases**](../../releases/latest) page!
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="assets/screenshots/stage-manager-overview.jpg" alt="Stage Manager Overview on Windows 11" width="100%" />
+  <em>Real-time GPU window previews organized along the screen edge with Start Menu active</em>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/stage-manager-multitasking.jpg" alt="Stage Manager Multitasking with VS Code" width="100%" />
+  <em>Active coding stage with neighboring stages curved inward and auto-hidden when working</em>
+</p>
+
+---
+
+## ✨ Features
+
+- **Live GPU Window Previews (`DwmRegisterThumbnail`)** — Direct hardware compositing links with rounded corners. Zero CPU screenshot polling.
+- **Auto-Hide & Smooth Spring Physics** — Damped spring physics (`f64`) synced to Windows DWM VSync (`DwmFlush`) for seamless 60Hz and 120Hz high-refresh displays.
+- **macOS Curved Ribbon Wave** — The hovered stage pops forward toward you while neighboring stages bend gently inward.
+- **Grouped App Hover Expansion** — Multi-window applications fan out horizontally on hover with individual Direct2D squircle icons so you can pick any specific window in one click.
+- **Infinite Carousel Scroll** — Seamlessly scroll through unlimited open applications; hovering the top or bottom edge wraps indefinitely in either direction.
+- **Independent Per-Monitor Strips** — Each connected monitor gets its own independent strip, trigger zone, and DPI scaling, managing only windows on that display. Hotplug display changes are automatically handled.
+- **Virtual Desktop Isolation** — Windows are tracked per Virtual Desktop GUID using `IVirtualDesktopManager`. Switching virtual desktops (`Win + Ctrl + Left/Right`) starts a clean workspace.
+- **System Tray App & Startup Boot** — Lives silently in the notification area with right-click configuration and a toggle for **Run at Windows Startup**.
+- **Tiny Footprint** — Compiles to a self-contained ~540 KB executable using under 20MB of RAM.
+
+---
+
+## 🔍 How It Works
+
+```
+                                    +-----------------------+
+                                    |   Windows OS / DWM    |
+                                    +-----------+-----------+
+                                                |
+                 +------------------------------+------------------------------+
+                 | (WinEvents: Focus, Move, Min)| (DwmFlush VSync Ticks)        | (IVirtualDesktopManager)
+                 v                              v                              v
+        +------------------+           +------------------+           +------------------+
+        |  WindowTracker   |           | Animation / Clock|           |  Desktop Tracker |
+        +--------+---------+           +--------+---------+           +--------+---------+
+                 |                              |                              |
+                 +----------------------+       |       +----------------------+
+                                        |       |       |
+                                        v       v       v
+                                  +---------------------------+
+                                  |    App Coordinator        |
+                                  | Map<(Desktop, Mon), State>|
+                                  +-------------+-------------+
+                                                |
+                 +------------------------------+------------------------------+
+                 |                                                             |
+                 v                                                             v
+        +------------------+                                          +------------------+
+        |   StageManager   |                                          |  Sidebar Window  |
+        |  Group & Switch  |                                          | Direct2D Render  |
+        +------------------+                                          +------------------+
+```
+
+1. **Window Discovery & Filtering:** `WindowTracker` enumerates top-level application windows while filtering out tooltips, cloaked windows, and system overlays. It listens for WinEvents (`EVENT_SYSTEM_FOREGROUND`, `EVENT_OBJECT_LOCATIONCHANGE`) to keep state updated in real-time.
+2. **Virtual Desktop & Monitor Routing:** Windows are sorted into independent workspaces keyed by `(VirtualDesktopId, MonitorHandle)`. Windows on Monitor 2 or Desktop 2 never bleed into Monitor 1.
+3. **Physics-Driven Layout:** Moving the cursor to the screen edge activates an auto-hide spring. When hovering over multi-window stages, an `expand_t` spring smoothly fans out window preview cards horizontally.
+4. **Rendering & Compositing:**
+   - **Thumbnails:** Handled directly by Windows DWM via `DwmUpdateThumbnailProperties` with destination clipping rectangles and rounded visual corners.
+   - **Icons & Badges:** Rendered through **Direct2D** onto a layered window with per-pixel 32-bit ARGB alpha blending (`UpdateLayeredWindow`).
+
+---
+
+## ⌨️ Controls & Shortcuts
+
+| Action | How to Trigger |
+|---|---|
+| **Reveal Stage Manager** | Move mouse cursor to the active screen edge (or top/bottom corner) |
+| **Toggle Sidebar Visibility** | `Win + \`` *(backtick)* or `Alt + \`` |
+| **Switch to Stage / Window** | Click any stage card (or hover to fan out and click an individual window) |
+| **Merge Window into Current Stage** | `Shift + Click` on any stage card |
+| **Cycle Next Stage** | `Win + Alt + →` |
+| **Cycle Previous Stage** | `Win + Alt + ←` |
+| **Scroll Infinite App List** | Mouse wheel over strip, or hover the top / bottom edge endpoints |
+| **Settings & Configuration** | Right-click the **Stage Manager** squircle icon in the system tray |
 
 ---
 
 ## 📚 Documentation
 
+Detailed technical documentation is available in the [`docs/`](docs/) directory:
+
 | Document | Description |
-| --- | --- |
-| [Architecture](docs/ARCHITECTURE.md) | Module map, data flows, animation loop |
-| [Configuration](docs/CONFIGURATION.md) | All settings, tray menu options, registry |
-| [Development Guide](docs/DEVELOPMENT.md) | Build from source, module tour, testing |
-| [Installation Guide](docs/INSTALLATION.md) | Installer, portable, uninstall |
-| [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues and fixes |
+|---|---|
+| [**Installation Guide**](docs/INSTALLATION.md) | In-depth setup guide for Git clone, prebuilt installer, portable mode, and uninstallation |
+| [**Architecture & Internals**](docs/ARCHITECTURE.md) | Module structure, data flow diagrams, memory model, and VSync animation timing |
+| [**Configuration Reference**](docs/CONFIGURATION.md) | Complete list of all 13 runtime settings, tray menu mappings, and registry keys |
+| [**Development Guide**](docs/DEVELOPMENT.md) | Guide for contributors: building, running unit tests, adding features, and code style |
+| [**Troubleshooting**](docs/TROUBLESHOOTING.md) | Solutions for common issues (tray icon recovery, hotkeys, display scaling, single-instance lock) |
 
 ---
 
-## Option 1: Install via Prebuilt Installer (Recommended)
+## 🛠️ Tech Stack
 
-1. Download **`StageManagerSetup.exe`** (or standalone portable `stage_manager.exe`) from the [**Releases**](../../releases) page.
-2. Double-click **`StageManagerSetup.exe`**.
-   - Installs to `%LOCALAPPDATA%\StageManager\stage_manager.exe`
-   - Adds a Start Menu shortcut (**Stage Manager**)
-   - Enables **Run at Windows Startup** automatically
-   - Registers an uninstaller in **Windows Settings → Apps → Installed Apps**
-   - Launches Stage Manager directly into the Windows system tray
-
-*(Silent CLI switches: `StageManagerSetup.exe --silent` and `StageManagerSetup.exe --uninstall`)*
-
----
-
-## Option 2: Clone & Build from Source
-
-### Prerequisites
-- Windows 10 or Windows 11 (DWM desktop composition enabled)
-- [Rust toolchain](https://rustup.rs/) (`stable` — works with either `x86_64-pc-windows-msvc` or `x86_64-pc-windows-gnu`)
-
-### Quick Run (Clone & Run)
-```powershell
-git clone <your-repo-url>
-cd "Stage manager"
-cargo run --release
-```
-
-### Build Standalone Installer (`StageManagerSetup.exe`)
-```powershell
-# 1. Build the main tray app
-cargo build --release --bin stage_manager
-# 2. Bundle it into the installer
-$env:STAGE_MANAGER_EMBED_PATH = "target\release\stage_manager.exe"
-cargo build --release --bin StageManagerSetup
-# 3. Collect outputs
-New-Item -ItemType Directory -Force -Path dist
-Copy-Item target\release\stage_manager.exe dist\
-Copy-Item target\release\StageManagerSetup.exe dist\
-```
-
-Outputs both `dist\StageManagerSetup.exe` (self-contained single-file installer) and `dist\stage_manager.exe` (portable tray executable).
-
----
-
-## Controls & Shortcuts
-
-| Action | Control |
-| --- | --- |
-| **Reveal Stage Manager** | Move mouse to the active screen edge (or top/bottom corner) |
-| **Toggle Sidebar** | `Win + \`` (or `Alt + \`` fallback), or click the tray icon |
-| **Switch to Stage / Specific Grouped Window** | Click any stage card (or hover a group to fan out & click any window) |
-| **Merge App into Active Stage** | `Shift + Click` on a stage card |
-| **Cycle Next / Previous Stage** | `Win + Alt + Right` / `Win + Alt + Left` |
-| **Scroll Infinite List** | Mouse wheel or hover top / bottom edge endpoints |
-| **Configure Settings & Boot Startup** | Right-click the **Stage Manager** icon in the Windows system tray |
+- **Language:** Rust (`edition = "2021"`, 100% safe Rust outside Win32 FFI calls)
+- **Windows API (`windows 0.58`):**
+  - **DWM Thumbnail API:** `DwmRegisterThumbnail`, `DwmUpdateThumbnailProperties`
+  - **VSync Sync:** `DwmFlush()` hardware vertical blank synchronizer
+  - **Direct2D & DirectWrite:** Vector squircle icons and text badge overlays
+  - **Virtual Desktops:** `IVirtualDesktopManager` COM interface
+  - **Multi-Monitor:** `EnumDisplayMonitors`, `GetDpiForMonitor`
+  - **Shell:** `Shell_NotifyIconW` (Tray Icon), `IShellLinkW` (Start Menu Shortcuts)
 
 ---
 
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions, bug reports, and suggestions are welcome!
+- Check out the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+- Browse open [Good First Issues](../../issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+- Report bugs using the [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md).
 
 ---
 
-## Tech Stack
+## 📄 License
 
-- **Language**: Rust (`edition = "2021"`)
-- **APIs**: `windows` crate (`0.58`) — DWM Thumbnails, `DwmFlush()` VSync clock, Direct2D + DirectWrite layered icon overlay, `IVirtualDesktopManager`, `EnumDisplayMonitors`, `Shell_NotifyIconW`, Win32 Registry & `IShellLinkW`
-
----
-
-## License
-
-[MIT](LICENSE)
+This project is open-source software licensed under the [MIT License](LICENSE).
