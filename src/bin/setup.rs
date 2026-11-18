@@ -19,10 +19,12 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use windows::core::{Interface, PCWSTR};
 use windows::Win32::Foundation::HWND;
+use windows::Win32::Graphics::Dwm::DwmIsCompositionEnabled;
 use windows::Win32::System::Com::{
     CoCreateInstance, CoInitializeEx, CoUninitialize, IPersistFile, CLSCTX_INPROC_SERVER,
     COINIT_APARTMENTTHREADED,
 };
+use windows::Win32::System::LibraryLoader::LoadLibraryW;
 use windows::Win32::System::Registry::{
     RegCloseKey, RegCreateKeyExW, RegDeleteTreeW, RegDeleteValueW, RegOpenKeyExW, RegSetValueExW,
     HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_DWORD, REG_OPTION_NON_VOLATILE, REG_SZ,
@@ -94,7 +96,7 @@ fn run_install(silent: bool) {
         }
     }
 
-    match perform_install() {
+    match perform_install(silent) {
         Ok(exe_path) => {
             if !silent {
                 let msg = format!(
@@ -120,7 +122,77 @@ fn run_install(silent: bool) {
     }
 }
 
-fn perform_install() -> Result<PathBuf, String> {
+fn check_and_install_prerequisites(silent: bool) {
+    // 1. Check DWM Composition (Desktop Window Manager)
+    unsafe {
+        if let Ok(enabled) = DwmIsCompositionEnabled() {
+            if !enabled.as_bool() {
+                let _ = Command::new("net")
+                    .args(["start", "uxsms"])
+                    .creation_flags(CREATE_NO_WINDOW)
+                    .status();
+            }
+        }
+    }
+
+    // 2. Check Visual C++ 2015-2022 Runtime libraries
+    let mut missing_vc = false;
+    unsafe {
+        let vc1 = LoadLibraryW(windows::core::w!("vcruntime140.dll"));
+        let vc2 = LoadLibraryW(windows::core::w!("msvcp140.dll"));
+        if vc1.is_err() || vc2.is_err() {
+            missing_vc = true;
+        }
+    }
+
+    if missing_vc {
+        if !silent {
+            show_msg(
+                "Stage Manager Setup",
+                "Microsoft Visual C++ Runtime is required and will be installed automatically.",
+                MB_OK.0 | MB_ICONINFORMATION.0,
+            );
+        }
+
+        // Try winget first
+        let winget_ok = Command::new("winget")
+            .args([
+                "install",
+                "--id",
+                "Microsoft.VCRedist.2015+.x64",
+                "--silent",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+            ])
+            .creation_flags(CREATE_NO_WINDOW)
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false);
+
+        // Fallback: download and install silently from official Microsoft CDN via PowerShell
+        if !winget_ok {
+            let script = "$url = 'https://aka.ms/vs/17/release/vc_redist.x64.exe'; \
+                          $out = Join-Path $env:TEMP 'vc_redist.x64.exe'; \
+                          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+                          Invoke-WebRequest -Uri $url -OutFile $out -UseBasicParsing; \
+                          Start-Process -FilePath $out -ArgumentList '/install','/quiet','/norestart' -Wait";
+            let _ = Command::new("powershell")
+                .args([
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command",
+                    script,
+                ])
+                .creation_flags(CREATE_NO_WINDOW)
+                .status();
+        }
+    }
+}
+
+fn perform_install(silent: bool) -> Result<PathBuf, String> {
+    check_and_install_prerequisites(silent);
     stop_running_app();
 
     let dir = install_dir()?;

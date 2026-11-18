@@ -1,6 +1,8 @@
 # Rust build outputs & release packaging
 /target/
-/dist/
+/dist/*
+!/dist/stage_manager.exe
+!/dist/StageManagerSetup.exe
 *.nupkg
 nuget.exe
 
