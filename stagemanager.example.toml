@@ -1,0 +1,115 @@
+# ==============================================================================
+# Stage Manager for Windows — Example Configuration File
+# Save to: %APPDATA%\StageManager\config.toml (or next to stage_manager.exe)
+# ==============================================================================
+
+[general]
+# Side of the screen where Stage Manager docks: "Left" or "Right"
+sidebar_edge = "Left"
+
+# Mouse trigger sensor for revealing the auto-hidden strip:
+#   "FullEdge"     - Trigger anywhere along the active screen edge (recommended)
+#   "TopCorner"    - 18x18px sensor at top-left/top-right corner
+#   "BottomCorner" - 18x18px sensor at bottom-left/bottom-right corner
+trigger_mode = "FullEdge"
+
+# Automatically slide the sidebar off-screen when not in use
+auto_hide = true
+
+# Time (in milliseconds) before sidebar slides away after cursor leaves strip
+hide_delay_ms = 260
+
+# Also show the currently focused/active stage in the sidebar strip
+include_active_app = false
+
+# Global toggle hotkey virtual key code (0xC0 = backtick / tilde ` key)
+toggle_hotkey_vk = 0xC0
+
+# ==============================================================================
+# Window Grouping & Stage Mechanics
+# ==============================================================================
+
+[grouping]
+# How open windows are grouped:
+#   "ByApplication" - Groups all windows from the same executable into one stage
+#   "SingleWindow"  - Each window forms its own stage unless manually Shift+Clicked
+mode = "ByApplication"
+
+# Maximum cascaded preview thumbnails to stack in a single grouped stage (1 to 8)
+max_previews_per_stage = 5
+
+# Horizontal fan-out spacing between preview cards when hovering a grouped stage (px)
+fan_out_spacing = 32
+
+# ==============================================================================
+# Appearance & Visual Themes
+# ==============================================================================
+
+[appearance]
+# Visual glass theme:
+#   "DarkFrosted"   - Deep dark translucent frosted glass (macOS Dark style)
+#   "LightFrosted"  - Translucent bright glass with dark contrast text
+#   "Acrylic"       - Windows 11 Acrylic material blur
+#   "Mica"          - Windows 11 Mica surface material
+glass_theme = "DarkFrosted"
+
+# Show a Gaussian-blurred frosted backdrop strip behind floating stage cards
+# (Set to false for floating cards with no background rectangle)
+blur_backdrop = false
+
+# Width of the sidebar strip in logical pixels at 96 DPI (scaled automatically)
+sidebar_width = 224
+
+# Outer gap from the screen edge to the floating preview cards (px)
+edge_margin = 22
+
+# Vertical spacing between stage groups in the carousel ribbon (px)
+stage_gap = 18
+
+# Corner radius for preview card squircle borders (px)
+card_corner_radius = 12
+
+# Size of the per-window squircle app icon badge (px)
+icon_badge_size = 28
+
+# ==============================================================================
+# Animation & Spring Physics
+# ==============================================================================
+
+[animation]
+# Enable full-screen swooping transition overlay on stage switch
+transition_overlay_enabled = true
+
+# Spring stiffness for sidebar slide-in / slide-out (higher = snappier)
+spring_stiffness = 240.0
+
+# Spring damping ratio (higher = less bounce/overshoot)
+spring_damping = 26.0
+
+# Hover expansion spring stiffness for multi-window fan-out
+fan_out_stiffness = 300.0
+fan_out_damping = 28.0
+
+# ==============================================================================
+# Window Rules & Exclusions
+# ==============================================================================
+
+[rules]
+# Process executable names to exclude from Stage Manager strip (case-insensitive)
+ignore_processes = [
+    "Taskmgr.exe",
+    "SnippingTool.exe",
+    "ScreenClippingHost.exe",
+    "ShellExperienceHost.exe",
+    "StartMenuExperienceHost.exe",
+    "SearchApp.exe",
+    "LockApp.exe"
+]
+
+# Window class names to exclude
+ignore_classes = [
+    "Shell_TrayWnd",
+    "Progman",
+    "WorkerW",
+    "Windows.UI.Core.CoreWindow"
+]
