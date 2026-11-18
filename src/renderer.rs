@@ -51,8 +51,7 @@ impl IconOverlayRenderer {
         unsafe {
             let d2d_factory: ID2D1Factory =
                 D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, None)?;
-            let dwrite_factory: IDWriteFactory =
-                DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)?;
+            let dwrite_factory: IDWriteFactory = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED)?;
 
             let rt_props = D2D1_RENDER_TARGET_PROPERTIES {
                 r#type: D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -198,9 +197,7 @@ impl IconOverlayRenderer {
                             let pill_sz = (15.0 * dpi_scale) as f32;
                             let px = match edge {
                                 SidebarEdge::Left => {
-                                    anchor_x
-                                        + (count.saturating_sub(1) as f32) * step_x
-                                        + sz
+                                    anchor_x + (count.saturating_sub(1) as f32) * step_x + sz
                                         - pill_sz * 0.5
                                 }
                                 SidebarEdge::Right => {
@@ -320,7 +317,8 @@ impl IconOverlayRenderer {
             self.dc_target.FillRoundedRectangle(&tile_rr, &tile_bg);
         }
         if let Ok(rim) = self.brush(1.0, 1.0, 1.0, 0.65 * alpha) {
-            self.dc_target.DrawRoundedRectangle(&tile_rr, &rim, 1.0, None);
+            self.dc_target
+                .DrawRoundedRectangle(&tile_rr, &rim, 1.0, None);
         }
 
         if let Some(Some(bmp)) = self.icon_cache.get(&hk) {
@@ -371,7 +369,8 @@ impl IconOverlayRenderer {
             };
 
             let mut bits: *mut core::ffi::c_void = std::ptr::null_mut();
-            if let Ok(bmp) = CreateDIBSection(self.mem_dc, &bmi, DIB_RGB_COLORS, &mut bits, None, 0) {
+            if let Ok(bmp) = CreateDIBSection(self.mem_dc, &bmi, DIB_RGB_COLORS, &mut bits, None, 0)
+            {
                 self.old_obj = SelectObject(self.mem_dc, bmp);
                 self.dib_bitmap = bmp;
                 self.buf_w = width;

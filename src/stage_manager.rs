@@ -47,7 +47,12 @@ impl StageManager {
     }
 
     /// Change grouping mode and re-partition existing windows cleanly.
-    pub fn set_grouping_mode(&mut self, mode: GroupingMode, tracked: &[TrackedWindow], foreground: Option<isize>) {
+    pub fn set_grouping_mode(
+        &mut self,
+        mode: GroupingMode,
+        tracked: &[TrackedWindow],
+        foreground: Option<isize>,
+    ) {
         if self.mode == mode {
             return;
         }
@@ -132,10 +137,11 @@ impl StageManager {
 
         // Fallback if no active stage yet: pick first non-minimized stage, or first stage
         if self.active_stage.is_none() && !self.stages.is_empty() {
-            let non_min = self
-                .stages
-                .iter()
-                .find(|s| s.windows.iter().any(|hk| by_key.get(hk).is_some_and(|w| !w.is_minimized)));
+            let non_min = self.stages.iter().find(|s| {
+                s.windows
+                    .iter()
+                    .any(|hk| by_key.get(hk).is_some_and(|w| !w.is_minimized))
+            });
             self.active_stage = Some(non_min.unwrap_or(&self.stages[0]).id);
         }
     }
@@ -162,7 +168,12 @@ impl StageManager {
         if Some(target_id) == self.active_stage {
             return None;
         }
-        let target_windows = self.stages.iter().find(|s| s.id == target_id)?.windows.clone();
+        let target_windows = self
+            .stages
+            .iter()
+            .find(|s| s.id == target_id)?
+            .windows
+            .clone();
         let from_stage = self.active_stage;
 
         let target_set: HashSet<isize> = target_windows.iter().copied().collect();
@@ -211,7 +222,12 @@ impl StageManager {
             }
         }
         if promoted_active {
-            let show_windows = self.stages.iter().find(|s| s.id == target_id)?.windows.clone();
+            let show_windows = self
+                .stages
+                .iter()
+                .find(|s| s.id == target_id)?
+                .windows
+                .clone();
             return Some(SwitchPlan {
                 from_stage: Some(target_id),
                 to_stage: target_id,
@@ -285,7 +301,11 @@ impl StageManager {
         }
         let cur = self.active_stage.unwrap_or(self.stages[0].id);
         let idx = self.stages.iter().position(|s| s.id == cur).unwrap_or(0);
-        let prev_idx = if idx == 0 { self.stages.len() - 1 } else { idx - 1 };
+        let prev_idx = if idx == 0 {
+            self.stages.len() - 1
+        } else {
+            idx - 1
+        };
         let prev_id = self.stages[prev_idx].id;
         self.switch_to(prev_id)
     }

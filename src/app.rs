@@ -540,7 +540,11 @@ impl App {
         self.monitors.retain(|k, _| keep.contains(k));
         self.outside_since.retain(|k, _| keep.contains(k));
 
-        if let Some(prim) = fresh.iter().find(|m| m.is_primary).or_else(|| fresh.first()) {
+        if let Some(prim) = fresh
+            .iter()
+            .find(|m| m.is_primary)
+            .or_else(|| fresh.first())
+        {
             self.primary_monitor = prim.monitor_key;
         }
 
@@ -554,7 +558,10 @@ impl App {
             }
         }
 
-        info!("Synchronized displays: {} monitor(s) active", self.sidebars.len());
+        info!(
+            "Synchronized displays: {} monitor(s) active",
+            self.sidebars.len()
+        );
         self.full_window_sync();
         self.wake_vsync();
     }

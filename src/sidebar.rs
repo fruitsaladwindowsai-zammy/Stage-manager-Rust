@@ -171,7 +171,11 @@ impl Sidebar {
         let icon_w = strip_width + (64.0 * dpi_scale).round() as i32;
         let icon_hwnd = unsafe {
             CreateWindowExW(
-                WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE,
+                WS_EX_LAYERED
+                    | WS_EX_TRANSPARENT
+                    | WS_EX_TOOLWINDOW
+                    | WS_EX_TOPMOST
+                    | WS_EX_NOACTIVATE,
                 PCWSTR(icon_class.as_ptr()),
                 PCWSTR(wide("Stage Manager Icons").as_ptr()),
                 WS_POPUP,
@@ -210,7 +214,8 @@ impl Sidebar {
         let revealed = !config.auto_hide;
         let reveal_val = if revealed { 1.0 } else { 0.0 };
         let icon_renderer = IconOverlayRenderer::new(dpi_scale)?;
-        let metrics = layout::compute_strip_metrics(0, strip_width, work_height, dpi_scale, &config);
+        let metrics =
+            layout::compute_strip_metrics(0, strip_width, work_height, dpi_scale, &config);
 
         info!(
             "macOS Stage Manager UI initialized [monitor={}] (strip={}x{} @ DPI {:.0}%, auto_hide={}, trigger={:?})",
@@ -274,12 +279,12 @@ impl Sidebar {
 
     pub fn set_revealed(&mut self, revealed: bool) {
         self.revealed = revealed;
-        self.reveal_spring.set_target(if revealed { 1.0 } else { 0.0 });
+        self.reveal_spring
+            .set_target(if revealed { 1.0 } else { 0.0 });
         if revealed {
             let mut pt = POINT::default();
             if unsafe { GetCursorPos(&mut pt).is_ok() } {
-                let py = (pt.y - self.work_area.top)
-                    .clamp(0, self.work_height) as f64;
+                let py = (pt.y - self.work_area.top).clamp(0, self.work_height) as f64;
                 self.pointer_y_spring = Spring::new(py, 360.0, 32.0);
                 self.pointer_focus_spring.set_target(1.0);
             }
@@ -461,7 +466,8 @@ impl Sidebar {
             }
         }
         self.icon_renderer.retain_icons(&active_icon_keys);
-        self.preview_slots.retain(|k, _| active_icon_keys.contains(k));
+        self.preview_slots
+            .retain(|k, _| active_icon_keys.contains(k));
 
         self.metrics = layout::compute_strip_metrics(
             stages.len(),
@@ -536,13 +542,12 @@ impl Sidebar {
                 let is_hovered = hit == Some(sid);
                 anim.hover_spring
                     .set_target(if is_hovered { 1.0 } else { 0.0 });
-                anim.expand_spring.set_target(
-                    if is_hovered && anim.target.windows.len() > 1 {
+                anim.expand_spring
+                    .set_target(if is_hovered && anim.target.windows.len() > 1 {
                         1.0
                     } else {
                         0.0
-                    },
-                );
+                    });
             }
             return true;
         }
@@ -563,7 +568,11 @@ impl Sidebar {
         changed
     }
 
-    pub fn on_pointer_click(&self, screen_x: i32, screen_y: i32) -> Option<(StageId, Option<isize>)> {
+    pub fn on_pointer_click(
+        &self,
+        screen_x: i32,
+        screen_y: i32,
+    ) -> Option<(StageId, Option<isize>)> {
         layout::hit_test_stage_or_window(&self.last_frames, screen_x, screen_y)
     }
 
@@ -572,12 +581,9 @@ impl Sidebar {
             return f.hit_rect;
         }
         if let Some(anim) = self.stage_anims.get(&stage_id) {
-            let top = layout::compute_slot_top(
-                anim.index_spring.value,
-                self.scroll_pos,
-                &self.metrics,
-            )
-            .round() as i32;
+            let top =
+                layout::compute_slot_top(anim.index_spring.value, self.scroll_pos, &self.metrics)
+                    .round() as i32;
             let ox = self.work_area.left;
             let oy = self.work_area.top;
             return RECT {
@@ -696,11 +702,8 @@ impl Sidebar {
                 continue;
             };
             let t = &anim.target;
-            let rel_top = layout::compute_slot_top(
-                anim.index_spring.value,
-                self.scroll_pos,
-                &self.metrics,
-            );
+            let rel_top =
+                layout::compute_slot_top(anim.index_spring.value, self.scroll_pos, &self.metrics);
 
             // Quick reject completely off-screen stages before creating DWM previews
             if rel_top + base_h < -28.0 || rel_top > self.work_height as f64 + 28.0 {
@@ -716,8 +719,7 @@ impl Sidebar {
             let dy = base_cy - self.pointer_y_spring.value;
             let norm = dy / curve_radius;
             let wave = (-norm * norm * 1.15).exp();
-            let active_t = ((0.65 * wave + 0.35 * hover_t) * p_focus
-                + hover_t * (1.0 - p_focus))
+            let active_t = ((0.65 * wave + 0.35 * hover_t) * p_focus + hover_t * (1.0 - p_focus))
                 .clamp(0.0, 1.0);
 
             let bend_scale = 1.0 + p_focus * (0.14 * active_t - 0.14 * (1.0 - active_t));
@@ -725,11 +727,8 @@ impl Sidebar {
             let curve_x = dir_sign
                 * (15.0 * active_t - 14.0 * p_focus * (1.0 - active_t).powf(1.25))
                 * self.dpi_scale;
-            let neighbor_push = (dy / curve_radius)
-                * (-norm * norm * 0.9).exp()
-                * 14.0
-                * self.dpi_scale
-                * p_focus;
+            let neighbor_push =
+                (dy / curve_radius) * (-norm * norm * 0.9).exp() * 14.0 * self.dpi_scale * p_focus;
 
             let cx = strip_origin_x
                 + (self.metrics.slot_left + self.metrics.slot_right) as f64 * 0.5
@@ -824,8 +823,9 @@ impl Sidebar {
                 let full_h = (p.rect.bottom - p.rect.top).max(1) as f64;
                 let clip_top_frac =
                     ((self.work_area.top - p.rect.top).max(0) as f64 / full_h).clamp(0.0, 0.98);
-                let clip_bot_frac =
-                    ((p.rect.bottom - self.work_area.bottom).max(0) as f64 / full_h).clamp(0.0, 0.98);
+                let clip_bot_frac = ((p.rect.bottom - self.work_area.bottom).max(0) as f64
+                    / full_h)
+                    .clamp(0.0, 0.98);
 
                 let clipped = RECT {
                     left: p.rect.left,
@@ -892,7 +892,7 @@ impl Sidebar {
             if fp.bottom <= self.work_area.top + 16 || fp.top >= self.work_area.bottom - 16 {
                 continue;
             }
-            for &(_, ref r) in &f.badge.expanded_previews {
+            for (_, r) in &f.badge.expanded_previews {
                 icon_min_x = icon_min_x.min(r.left - badge_margin);
                 icon_max_x = icon_max_x.max(r.right + badge_margin);
             }
@@ -1007,7 +1007,11 @@ impl Sidebar {
                             0,
                             0,
                             0,
-                            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW,
+                            SWP_NOMOVE
+                                | SWP_NOSIZE
+                                | SWP_NOZORDER
+                                | SWP_NOACTIVATE
+                                | SWP_HIDEWINDOW,
                         ) {
                             hdwp = next;
                         }
@@ -1121,9 +1125,12 @@ fn corner_trigger_rect(config: &Config, work_area: &RECT, dpi_scale: f64) -> (i3
         (SidebarEdge::Left, TriggerMode::TopCorner) => {
             (work_area.left, work_area.top, corner_sz, corner_sz)
         }
-        (SidebarEdge::Right, TriggerMode::TopCorner) => {
-            (work_area.right - corner_sz, work_area.top, corner_sz, corner_sz)
-        }
+        (SidebarEdge::Right, TriggerMode::TopCorner) => (
+            work_area.right - corner_sz,
+            work_area.top,
+            corner_sz,
+            corner_sz,
+        ),
         (SidebarEdge::Left, TriggerMode::BottomCorner) => (
             work_area.left,
             work_area.bottom - corner_sz,

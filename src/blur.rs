@@ -116,5 +116,7 @@ pub fn apply_rounded_preview_style(hwnd: HWND) {
 unsafe fn load_set_window_composition_attribute() -> Option<SetWindowCompositionAttributeFn> {
     let user32 = GetModuleHandleW(w!("user32.dll")).ok()?;
     let proc = GetProcAddress(user32, s!("SetWindowCompositionAttribute"))?;
-    Some(std::mem::transmute::<_, SetWindowCompositionAttributeFn>(proc))
+    Some(std::mem::transmute::<_, SetWindowCompositionAttributeFn>(
+        proc,
+    ))
 }

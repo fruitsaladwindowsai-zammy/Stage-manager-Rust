@@ -5,11 +5,13 @@ use log::{debug, warn};
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicIsize, Ordering};
 use windows::core::{PCWSTR, PWSTR};
 use windows::Win32::Foundation::{CloseHandle, BOOL, HWND, LPARAM, MAX_PATH, RECT, TRUE, WPARAM};
-use windows::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_CLOAKED, DWMWA_EXTENDED_FRAME_BOUNDS};
+use windows::Win32::Graphics::Dwm::{
+    DwmGetWindowAttribute, DWMWA_CLOAKED, DWMWA_EXTENDED_FRAME_BOUNDS,
+};
 use windows::Win32::Storage::FileSystem::FILE_FLAGS_AND_ATTRIBUTES;
 use windows::Win32::System::Threading::{
     GetCurrentProcessId, OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32,
@@ -414,7 +416,7 @@ fn query_exe_for_hwnd(hwnd: HWND) -> (String, PathBuf) {
     (String::new(), PathBuf::new())
 }
 
-fn query_window_icon(hwnd: HWND, exe_path: &PathBuf) -> (Option<HICON>, bool) {
+fn query_window_icon(hwnd: HWND, exe_path: &Path) -> (Option<HICON>, bool) {
     unsafe {
         // 1. Ask the window directly (with short timeout so hung apps don't block us)
         for icon_type in [ICON_BIG as usize, ICON_SMALL2 as usize, ICON_SMALL as usize] {

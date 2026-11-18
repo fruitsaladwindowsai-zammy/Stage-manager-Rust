@@ -176,7 +176,8 @@ pub fn is_run_at_startup_enabled() -> bool {
         {
             return false;
         }
-        let exists = RegQueryValueExW(hkey, PCWSTR(val_name.as_ptr()), None, None, None, None).is_ok();
+        let exists =
+            RegQueryValueExW(hkey, PCWSTR(val_name.as_ptr()), None, None, None, None).is_ok();
         let _ = RegCloseKey(hkey);
         exists
     }

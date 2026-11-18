@@ -7,6 +7,11 @@
 //! - Damped spring physics driven by `DwmFlush()` VSync for 60–144Hz+ motion
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![allow(
+    clippy::too_many_arguments,
+    clippy::chunks_exact_to_as_chunks,
+    clippy::missing_transmute_annotations
+)]
 
 mod animation;
 mod app;
@@ -30,7 +35,7 @@ use std::os::windows::ffi::OsStrExt;
 use std::sync::OnceLock;
 use std::time::Instant;
 use windows::core::PCWSTR;
-use windows::Win32::Foundation::{CloseHandle, ERROR_ALREADY_EXISTS, GetLastError};
+use windows::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS};
 use windows::Win32::System::Com::{CoInitializeEx, CoUninitialize, COINIT_APARTMENTTHREADED};
 use windows::Win32::System::Threading::CreateMutexW;
 use windows::Win32::UI::HiDpi::{
@@ -49,7 +54,12 @@ impl log::Log for SimpleLogger {
     fn log(&self, record: &Record) {
         if self.enabled(record.metadata()) {
             let ms = self.started.elapsed().as_millis();
-            eprintln!("[{ms:>7}ms {:5} {}] {}", record.level(), record.target(), record.args());
+            eprintln!(
+                "[{ms:>7}ms {:5} {}] {}",
+                record.level(),
+                record.target(),
+                record.args()
+            );
         }
     }
 

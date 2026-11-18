@@ -22,7 +22,11 @@ fn main() {
     }
 
     let code = if let Some(p) = embedded_path {
-        let escaped = p.display().to_string().replace('\\', "\\\\").replace('"', "\\\"");
+        let escaped = p
+            .display()
+            .to_string()
+            .replace('\\', "\\\\")
+            .replace('"', "\\\"");
         format!("pub const EMBEDDED_STAGE_MANAGER: Option<&[u8]> = Some(include_bytes!(\"{escaped}\"));\n")
     } else {
         "pub const EMBEDDED_STAGE_MANAGER: Option<&[u8]> = None;\n".to_string()

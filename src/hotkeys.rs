@@ -12,10 +12,22 @@ pub const HOTKEY_PREV_STAGE: i32 = 3;
 
 pub fn register_hotkeys(hwnd: HWND, toggle_vk: u32) {
     unsafe {
-        if RegisterHotKey(hwnd, HOTKEY_TOGGLE_SIDEBAR, MOD_WIN | MOD_NOREPEAT, toggle_vk).is_ok() {
+        if RegisterHotKey(
+            hwnd,
+            HOTKEY_TOGGLE_SIDEBAR,
+            MOD_WIN | MOD_NOREPEAT,
+            toggle_vk,
+        )
+        .is_ok()
+        {
             info!("Registered hotkey: Win+` (toggle sidebar)");
-        } else if RegisterHotKey(hwnd, HOTKEY_TOGGLE_SIDEBAR, MOD_ALT | MOD_NOREPEAT, toggle_vk)
-            .is_ok()
+        } else if RegisterHotKey(
+            hwnd,
+            HOTKEY_TOGGLE_SIDEBAR,
+            MOD_ALT | MOD_NOREPEAT,
+            toggle_vk,
+        )
+        .is_ok()
         {
             info!("Registered fallback hotkey: Alt+` (toggle sidebar)");
         } else {

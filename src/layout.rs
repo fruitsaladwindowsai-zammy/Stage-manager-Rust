@@ -116,11 +116,7 @@ pub fn compute_strip_metrics(
 
 /// Compute screen-relative vertical top coordinate inside `[0..work_h)` for a stage slot,
 /// seamlessly wrapping around infinitely at both top and bottom when `metrics.overflows` is true.
-pub fn compute_slot_top(
-    slot_index: f64,
-    scroll_pos: f64,
-    metrics: &StageStripMetrics,
-) -> f64 {
+pub fn compute_slot_top(slot_index: f64, scroll_pos: f64, metrics: &StageStripMetrics) -> f64 {
     if !metrics.overflows || metrics.cycle_h <= 0.0 {
         return metrics.start_y as f64 + slot_index * metrics.pitch;
     }
@@ -293,7 +289,10 @@ pub fn fit_aspect(max_w: i32, max_h: i32, aspect: f64) -> (i32, i32) {
     if w_from_h <= max_w {
         (w_from_h.max(1), max_h.max(1))
     } else {
-        (max_w.max(1), ((max_w as f64 / aspect).round() as i32).max(1))
+        (
+            max_w.max(1),
+            ((max_w as f64 / aspect).round() as i32).max(1),
+        )
     }
 }
 
@@ -352,15 +351,15 @@ mod tests {
         let ys_fwd: Vec<f64> = (0..14)
             .map(|i| compute_slot_top(i as f64, 5200.0, &metrics))
             .collect();
-        assert!(ys_fwd.iter().any(|&y| y >= 0.0 && y < 400.0));
-        assert!(ys_fwd.iter().any(|&y| y >= 400.0 && y < 800.0));
+        assert!(ys_fwd.iter().any(|&y| (0.0..400.0).contains(&y)));
+        assert!(ys_fwd.iter().any(|&y| (400.0..800.0).contains(&y)));
 
         // Scroll far backward (top-end infinite scroll)
         let ys_back: Vec<f64> = (0..14)
             .map(|i| compute_slot_top(i as f64, -5200.0, &metrics))
             .collect();
-        assert!(ys_back.iter().any(|&y| y >= 0.0 && y < 400.0));
-        assert!(ys_back.iter().any(|&y| y >= 400.0 && y < 800.0));
+        assert!(ys_back.iter().any(|&y| (0.0..400.0).contains(&y)));
+        assert!(ys_back.iter().any(|&y| (400.0..800.0).contains(&y)));
     }
 
     #[test]
@@ -395,9 +394,16 @@ mod tests {
             right: 1920,
             bottom: 1040,
         };
-        let list = layout_stage_cascade(&[1, 2, 3], &r, &work, 1.0, 0.0, 0.0, SidebarEdge::Left, &|_| {
-            Some((1600, 1000))
-        });
+        let list = layout_stage_cascade(
+            &[1, 2, 3],
+            &r,
+            &work,
+            1.0,
+            0.0,
+            0.0,
+            SidebarEdge::Left,
+            &|_| Some((1600, 1000)),
+        );
         assert_eq!(list.len(), 3);
         assert_eq!(list[0].hwnd_key, 1);
         assert!(list[0].rect.left < list[1].rect.left);

@@ -98,7 +98,12 @@ impl TrayIcon {
                 "Show Stage Manager (Win+` / Alt+`)"
             };
             append_item(menu, MENU_TOGGLE_SIDEBAR, toggle_label, false);
-            append_item(menu, MENU_AUTO_HIDE, "Auto-Hide (Side Edge Trigger)", config.auto_hide);
+            append_item(
+                menu,
+                MENU_AUTO_HIDE,
+                "Auto-Hide (Side Edge Trigger)",
+                config.auto_hide,
+            );
 
             let _ = AppendMenuW(menu, MF_SEPARATOR, 0, PCWSTR::null());
 
@@ -283,30 +288,18 @@ fn create_stage_manager_hicon(size: i32) -> Option<HICON> {
             );
 
             // Three stacked stage cards along left edge
-            for (i, (top_f, bot_f)) in [(0.20, 0.36), (0.42, 0.58), (0.64, 0.80)].iter().enumerate() {
-                let card_cov = in_rounded_rect(
-                    x,
-                    y,
-                    s * 0.16,
-                    s * top_f,
-                    s * 0.36,
-                    s * bot_f,
-                    s * 0.04,
-                );
+            for (i, (top_f, bot_f)) in [(0.20, 0.36), (0.42, 0.58), (0.64, 0.80)]
+                .iter()
+                .enumerate()
+            {
+                let card_cov =
+                    in_rounded_rect(x, y, s * 0.16, s * top_f, s * 0.36, s * bot_f, s * 0.04);
                 let bright = if i == 1 { 0.96 } else { 0.78 };
                 c = blend(c, bright, bright + 0.02, 1.0, card_cov * 0.95);
             }
 
             // Main active window card on the right
-            let main_cov = in_rounded_rect(
-                x,
-                y,
-                s * 0.43,
-                s * 0.22,
-                s * 0.84,
-                s * 0.78,
-                s * 0.09,
-            );
+            let main_cov = in_rounded_rect(x, y, s * 0.43, s * 0.22, s * 0.84, s * 0.78, s * 0.09);
             c = blend(c, 0.96, 0.98, 1.0, main_cov * 0.98);
             pixels[idx] = c;
         }

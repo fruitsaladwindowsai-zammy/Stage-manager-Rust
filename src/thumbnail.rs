@@ -18,7 +18,10 @@ pub struct ThumbnailLink {
 impl ThumbnailLink {
     pub fn new(dest_hwnd: HWND, src_hwnd: HWND) -> windows::core::Result<Self> {
         let handle = unsafe { DwmRegisterThumbnail(dest_hwnd, src_hwnd)? };
-        debug!("DWM thumbnail registered: src={:?} -> handle={}", src_hwnd, handle);
+        debug!(
+            "DWM thumbnail registered: src={:?} -> handle={}",
+            src_hwnd, handle
+        );
         Ok(Self { handle })
     }
 
