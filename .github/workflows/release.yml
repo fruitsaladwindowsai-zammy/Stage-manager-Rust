@@ -4,8 +4,6 @@ on:
   push:
     branches: [main, master]
     tags: ["v*"]
-  pull_request:
-    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -13,11 +11,24 @@ permissions:
   packages: write
 
 jobs:
-  build-windows:
+  build-and-release:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Determine Release Version & Tag
+        id: release_info
+        shell: pwsh
+        run: |
+          if ("${{ github.ref }}" -like "refs/tags/v*") {
+            $tag = "${{ github.ref_name }}"
+          } else {
+            $cargoVer = (Get-Content Cargo.toml | Select-String 'version\s*=\s*"([^"]+)"').Matches[0].Groups[1].Value
+            $tag = "v$cargoVer"
+          }
+          Write-Host "Releasing under tag: $tag"
+          "RELEASE_TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -35,7 +46,7 @@ jobs:
       - name: Pack NuGet Package
         run: nuget pack StageManager.nuspec -OutputDirectory dist
 
-      - name: Upload build artifacts
+      - name: Upload build artifacts to CI
         uses: actions/upload-artifact@v4
         with:
           name: stage-manager-windows-x64
@@ -45,23 +56,25 @@ jobs:
             dist/*.nupkg
 
       - name: Push to GitHub Packages NuGet Registry
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push'
         run: |
           nuget sources Add -Name "GitHub" -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -UserName "${{ github.repository_owner }}" -Password "${{ secrets.GITHUB_TOKEN }}"
           nuget push dist/*.nupkg -Source "GitHub" -SkipDuplicate
         continue-on-error: true
 
       - name: Push to NuGet.org (if NUGET_API_KEY secret is configured)
-        if: startsWith(github.ref, 'refs/tags/v') && env.NUGET_API_KEY != ''
+        if: github.event_name == 'push' && env.NUGET_API_KEY != ''
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: nuget push dist/*.nupkg -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
         continue-on-error: true
 
-      - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish Automated GitHub Release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "Stage Manager for Windows ${{ env.RELEASE_TAG }}"
           files: |
             dist/StageManagerSetup.exe
             dist/stage_manager.exe
