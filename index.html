@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stage Manager for Windows — Native macOS Multitasking in Rust</title>
+  <meta name="description" content="A native, lightweight macOS-style Stage Manager for Windows 10 & 11 written in Rust using DWM Thumbnails, Direct2D, and spring physics.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">⊞</div>
+      <span>Stage Manager for Windows</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#simulator">Simulator</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#quickstart">Quickstart</a></li>
+      <li><a href="#shortcuts">Shortcuts</a></li>
+      <li><a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/wiki" target="_blank">Wiki</a></li>
+      <li>
+        <button id="theme-toggle" class="sim-btn" style="padding: 6px 12px; font-size: 1rem;" title="Toggle Theme">☀️</button>
+      </li>
+      <li>
+        <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/releases/latest" class="btn-header">
+          ⬇ Download v0.1.0
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="badge-pill">
+      <span>🚀 Open Source • Built in Pure Rust with Win32 DWM</span>
+    </div>
+    <h1 class="hero-title">
+      macOS Stage Manager.<br>Native on Windows 10 & 11.
+    </h1>
+    <p class="hero-subtitle">
+      Organize open applications into fluid, hardware-accelerated visual stages. Features live GPU previews via DWM, 60/120Hz VSync spring physics, multi-monitor isolation, and virtual desktop integration — with zero Electron or screenshot bloat.
+    </p>
+
+    <div class="hero-cta">
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/releases/latest" class="btn-primary">
+        ⬇ Download StageManagerSetup.exe
+      </a>
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust" class="btn-secondary" target="_blank">
+        ★ Star on GitHub
+      </a>
+    </div>
+  </header>
+
+  <!-- Interactive Live Simulator Section -->
+  <section id="simulator" class="simulator-wrapper">
+    <div class="simulator-header">
+      <div class="window-dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="sim-title">Live Interactive Stage Manager Demo (Hover Screen Edge)</div>
+      <div class="sim-controls">
+        <button id="sim-toggle-sidebar" class="sim-btn">Toggle Strip (Win + `)</button>
+      </div>
+    </div>
+
+    <div class="screen-canvas">
+      <!-- Left Edge Sensor Trigger Zone -->
+      <div class="trigger-zone" title="Move your mouse cursor here to reveal Stage Manager!"></div>
+
+      <!-- Floating Stage Manager Strip -->
+      <div class="sim-sidebar">
+        <!-- Stage 1: Google Chrome -->
+        <div class="stage-card" data-stage="1" title="Click to switch to Google Chrome">
+          <div class="card-icon red">G</div>
+        </div>
+
+        <!-- Stage 2: VS Code (Grouped with Fan-Out) -->
+        <div class="stage-card active" data-stage="2" title="Grouped App: Hover to fan out windows!">
+          <div class="card-icon blue">VS</div>
+          <div class="group-badge">2</div>
+          <!-- Horizontal Fan-Out Preview Cards -->
+          <div class="fan-out-container">
+            <div class="fanned-card" data-window="main.rs" title="Click Window 2 (main.rs)">
+              <div class="card-icon blue" style="left: -6px; top: 12px; width: 20px; height: 20px; font-size: 9px;">W2</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 3: Windows Terminal -->
+        <div class="stage-card" data-stage="3" title="Click to switch to Windows Terminal">
+          <div class="card-icon green">&gt;_</div>
+        </div>
+
+        <!-- Stage 4: File Explorer -->
+        <div class="stage-card" data-stage="4" title="Click to switch to File Explorer">
+          <div class="card-icon amber">📁</div>
+        </div>
+      </div>
+
+      <!-- Center Desktop Workspace Area -->
+      <div class="desktop-workspace">
+        <div class="mock-window">
+          <div class="mock-titlebar">
+            <span class="mock-window-title">Visual Studio Code — Stage Manager in Rust (main.rs)</span>
+            <span style="opacity: 0.6;">Windows 11 Work Area</span>
+          </div>
+          <div class="mock-content">
+            <div class="mock-line accent short"></div>
+            <div class="mock-line medium"></div>
+            <div class="mock-line"></div>
+            <div class="mock-line medium"></div>
+            <div class="mock-line short"></div>
+            <div class="mock-line accent" style="width: 50%;"></div>
+            <div class="mock-line medium"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid Section -->
+  <section id="features" class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">Built for Performance & Elegance</h2>
+      <p class="section-subtitle">
+        Engineered specifically for Windows 10 & 11 using native Win32 hardware composition.
+      </p>
+    </div>
+
+    <div class="grid-3">
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3 class="feature-title">Live DWM Thumbnails</h3>
+        <p class="feature-desc">
+          Links directly to the Windows Desktop Window Manager hardware compositor via <code>DwmRegisterThumbnail</code>. Zero CPU screenshot polling overhead.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon">🌊</div>
+        <h3 class="feature-title">VSync Spring Physics</h3>
+        <p class="feature-desc">
+          Smooth, fluid motion governed by second-order damped spring dynamics paced to display vertical blank intervals (<code>DwmFlush</code>) for 60Hz and 120Hz refresh rates.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h3 class="feature-title">Group Hover Fan-Out</h3>
+        <p class="feature-desc">
+          Multi-window application stages fan out horizontally in real time when hovered, rendering individual Direct2D squircle icons for direct window targeting.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <h3 class="feature-title">Multi-Monitor Isolation</h3>
+        <p class="feature-desc">
+          Each connected display runs its own independent stage strip, trigger sensor, and per-monitor DPI scaling, managing only windows located on that screen.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-card">
+        <div class="feature-icon">🪟</div>
+        <h3 class="feature-title">Virtual Desktop Aware</h3>
+        <p class="feature-desc">
+          Integrates with the Windows <code>IVirtualDesktopManager</code> COM interface, isolating stage workspaces across Windows Virtual Desktops.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-card">
+        <div class="feature-icon">🪶</div>
+        <h3 class="feature-title">Sub-Megabyte Footprint</h3>
+        <p class="feature-desc">
+          Compiles to a self-contained ~540 KB executable using under 20 MB of system RAM. Lives quietly in your Windows notification tray.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quickstart Terminal Section -->
+  <section id="quickstart" class="quickstart-section">
+    <div class="section-header">
+      <h2 class="section-title">Install in 60 Seconds</h2>
+      <p class="section-subtitle">Clone and run directly with the Rust toolchain or grab the one-click installer.</p>
+    </div>
+
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <div class="window-dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">PowerShell (Clean Machine Setup)</span>
+      </div>
+      <div class="terminal-body">
+        <!-- Command 1 -->
+        <div class="code-row">
+          <span class="code-text">winget install --id Git.Git -e --source winget; winget install --id Rustlang.Rustup -e --source winget</span>
+          <button class="copy-btn" data-copy-text="winget install --id Git.Git -e --source winget; winget install --id Rustlang.Rustup -e --source winget">Copy</button>
+        </div>
+
+        <!-- Command 2 -->
+        <div class="code-row">
+          <span class="code-text">git clone https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust.git</span>
+          <button class="copy-btn" data-copy-text="git clone https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust.git">Copy</button>
+        </div>
+
+        <!-- Command 3 -->
+        <div class="code-row">
+          <span class="code-text">cd Stage-manager-Rust &amp;&amp; cargo run --release</span>
+          <button class="copy-btn" data-copy-text="cd Stage-manager-Rust &amp;&amp; cargo run --release">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Keyboard Shortcuts Section -->
+  <section id="shortcuts" class="features-section" style="padding-top: 0;">
+    <div class="section-header">
+      <h2 class="section-title">Keyboard Shortcuts &amp; Controls</h2>
+      <p class="section-subtitle">Quick reference for everyday stage navigation.</p>
+    </div>
+
+    <div style="max-width: 800px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border-color);">
+            <th style="padding: 14px 20px; font-size: 0.9rem; color: var(--text-secondary);">Shortcut / Input</th>
+            <th style="padding: 14px 20px; font-size: 0.9rem; color: var(--text-secondary);">Action</th>
+          </tr>
+        </thead>
+        <tbody style="font-size: 0.95rem;">
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Win + ` (or Alt + `)</td>
+            <td style="padding: 14px 20px;">Toggle Stage Manager sidebar visibility</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Move mouse to edge</td>
+            <td style="padding: 14px 20px;">Smoothly reveal auto-hidden stage ribbon</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Click stage card</td>
+            <td style="padding: 14px 20px;">Switch active workspace to selected stage</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Hover grouped stage</td>
+            <td style="padding: 14px 20px;">Horizontally fan out individual windows in the group</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Shift + Click stage</td>
+            <td style="padding: 14px 20px;">Merge window into current active stage</td>
+          </tr>
+          <tr>
+            <td style="padding: 14px 20px; font-family: var(--font-mono); color: var(--accent-blue);">Win + Alt + ← / →</td>
+            <td style="padding: 14px 20px;">Cycle through stages sequentially</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust" target="_blank">GitHub</a>
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/releases" target="_blank">Releases</a>
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/wiki" target="_blank">Documentation Wiki</a>
+      <a href="https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust/issues" target="_blank">Report Issue</a>
+    </div>
+    <p>Stage Manager for Windows is open-source software licensed under the MIT License.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
