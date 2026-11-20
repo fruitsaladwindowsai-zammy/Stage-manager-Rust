@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b0c12ac8.js";
+            window.path_to_searchindex_js = "searchindex-586aa8f4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-e56531bd.js"></script>
@@ -349,7 +349,15 @@ $$\Delta x_i = -A \cdot \exp\left(-\frac{(y_i - y_{\text{cursor}})^2}{2\sigma^2}
 <li>Moving an application window from Monitor 1 to Monitor 2 automatically migrates its stage card across to the destination monitor.</li>
 </ul>
 <hr>
-<h2 id="2-display-hotplugging"><a class="header" href="#2-display-hotplugging">2. Display Hotplugging</a></h2>
+<h2 id="2-multi-monitor-span-mode--boundary-isolation"><a class="header" href="#2-multi-monitor-span-mode--boundary-isolation">2. Multi-Monitor Span Mode &amp; Boundary Isolation</a></h2>
+<p>In multi-monitor setups where Windows displays are placed side-by-side or when the desktop wallpaper is configured in <strong>Span mode</strong>, virtual desktop coordinates are continuous:</p>
+<ul>
+<li>Stage Manager preview windows, the Acrylic backdrop blur, and the Direct2D icon overlay are clamped strictly to <code>self.work_area</code>.</li>
+<li>When the sidebar slides off-screen or reveals, cards utilize horizontal normalized cropping (<code>clip_left_frac</code> and <code>clip_right_frac</code>) in addition to vertical bounds cropping.</li>
+<li>Elements sliding off the screen edge smoothly crop against the monitor boundary and never bleed into or split across adjacent displays.</li>
+</ul>
+<hr>
+<h2 id="3-display-hotplugging"><a class="header" href="#3-display-hotplugging">3. Display Hotplugging</a></h2>
 <p>When displays are connected, disconnected, or reconfigured:</p>
 <ol>
 <li>Windows emits <code>WM_DISPLAYCHANGE</code>.</li>
@@ -424,7 +432,15 @@ $$\Delta x_i = -A \cdot \exp\left(-\frac{(y_i - y_{\text{cursor}})^2}{2\sigma^2}
 </code></pre>
 <p>Value: <code>"C:\Users\&lt;Username&gt;\AppData\Local\StageManager\stage_manager.exe"</code></p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="release-notes-v010"><a class="header" href="#release-notes-v010">Release Notes (v0.1.0)</a></h1>
+<h1 id="release-notes"><a class="header" href="#release-notes">Release Notes</a></h1>
+<h2 id="020--multi-monitor-span-isolation--clean-visuals-2026-11-20"><a class="header" href="#020--multi-monitor-span-isolation--clean-visuals-2026-11-20">[0.2.0] — Multi-Monitor Span Isolation &amp; Clean Visuals (2026-11-20)</a></h2>
+<ul>
+<li><strong>Multi-Monitor Wallpaper Span Isolation</strong>: Cards, Acrylic backdrop blur, and icon layers are clamped strictly within the active monitor’s bounds, eliminating visual bleed or splitting onto neighboring monitors when wallpaper is in span mode.</li>
+<li><strong>Pure Borderless Stage Icons</strong>: Removed background squircle tiles, drop shadows, and outer borders from stage icons, rendering clean application icons with natural alpha.</li>
+<li><strong>Automated Prerequisite Verification</strong>: Standalone installer checks for 64-bit architecture, Windows 10/11 version, and DWM composition prior to installation.</li>
+<li><strong>Continuous Automated Release</strong>: Pipeline automatically triggers tests, builds, and GitHub releases on master pushes.</li>
+</ul>
+<hr>
 <h2 id="010--initial-public-release-2024-11-12"><a class="header" href="#010--initial-public-release-2024-11-12">[0.1.0] — Initial Public Release (2024-11-12)</a></h2>
 <p>Stage Manager for Windows brings the intuitive, visual stage-based multitasking experience of macOS to Windows 10 and Windows 11 as a native, ultra-lightweight Rust application.</p>
 <hr>

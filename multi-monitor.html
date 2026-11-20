@@ -34,7 +34,7 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b0c12ac8.js";
+            window.path_to_searchindex_js = "searchindex-586aa8f4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-e56531bd.js"></script>
@@ -191,7 +191,15 @@
 <li>Moving an application window from Monitor 1 to Monitor 2 automatically migrates its stage card across to the destination monitor.</li>
 </ul>
 <hr>
-<h2 id="2-display-hotplugging"><a class="header" href="#2-display-hotplugging">2. Display Hotplugging</a></h2>
+<h2 id="2-multi-monitor-span-mode--boundary-isolation"><a class="header" href="#2-multi-monitor-span-mode--boundary-isolation">2. Multi-Monitor Span Mode &amp; Boundary Isolation</a></h2>
+<p>In multi-monitor setups where Windows displays are placed side-by-side or when the desktop wallpaper is configured in <strong>Span mode</strong>, virtual desktop coordinates are continuous:</p>
+<ul>
+<li>Stage Manager preview windows, the Acrylic backdrop blur, and the Direct2D icon overlay are clamped strictly to <code>self.work_area</code>.</li>
+<li>When the sidebar slides off-screen or reveals, cards utilize horizontal normalized cropping (<code>clip_left_frac</code> and <code>clip_right_frac</code>) in addition to vertical bounds cropping.</li>
+<li>Elements sliding off the screen edge smoothly crop against the monitor boundary and never bleed into or split across adjacent displays.</li>
+</ul>
+<hr>
+<h2 id="3-display-hotplugging"><a class="header" href="#3-display-hotplugging">3. Display Hotplugging</a></h2>
 <p>When displays are connected, disconnected, or reconfigured:</p>
 <ol>
 <li>Windows emits <code>WM_DISPLAYCHANGE</code>.</li>

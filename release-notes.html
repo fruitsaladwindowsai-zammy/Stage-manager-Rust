@@ -34,7 +34,7 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-b0c12ac8.js";
+            window.path_to_searchindex_js = "searchindex-586aa8f4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-e56531bd.js"></script>
@@ -179,7 +179,15 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="release-notes-v010"><a class="header" href="#release-notes-v010">Release Notes (v0.1.0)</a></h1>
+                        <h1 id="release-notes"><a class="header" href="#release-notes">Release Notes</a></h1>
+<h2 id="020--multi-monitor-span-isolation--clean-visuals-2026-11-20"><a class="header" href="#020--multi-monitor-span-isolation--clean-visuals-2026-11-20">[0.2.0] — Multi-Monitor Span Isolation &amp; Clean Visuals (2026-11-20)</a></h2>
+<ul>
+<li><strong>Multi-Monitor Wallpaper Span Isolation</strong>: Cards, Acrylic backdrop blur, and icon layers are clamped strictly within the active monitor’s bounds, eliminating visual bleed or splitting onto neighboring monitors when wallpaper is in span mode.</li>
+<li><strong>Pure Borderless Stage Icons</strong>: Removed background squircle tiles, drop shadows, and outer borders from stage icons, rendering clean application icons with natural alpha.</li>
+<li><strong>Automated Prerequisite Verification</strong>: Standalone installer checks for 64-bit architecture, Windows 10/11 version, and DWM composition prior to installation.</li>
+<li><strong>Continuous Automated Release</strong>: Pipeline automatically triggers tests, builds, and GitHub releases on master pushes.</li>
+</ul>
+<hr>
 <h2 id="010--initial-public-release-2024-11-12"><a class="header" href="#010--initial-public-release-2024-11-12">[0.1.0] — Initial Public Release (2024-11-12)</a></h2>
 <p>Stage Manager for Windows brings the intuitive, visual stage-based multitasking experience of macOS to Windows 10 and Windows 11 as a native, ultra-lightweight Rust application.</p>
 <hr>
