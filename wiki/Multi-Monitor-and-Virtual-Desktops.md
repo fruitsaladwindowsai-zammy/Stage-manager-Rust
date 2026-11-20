@@ -13,6 +13,11 @@ Unlike taskbars that mirror or duplicate cards across screens, Stage Manager imp
 - Windows positioned on Monitor 2 are managed exclusively on Monitor 2's stage strip.
 - Moving an application window from Monitor 1 to Monitor 2 automatically migrates its stage card across to the destination monitor.
 
+### Multi-Monitor Span Mode & Boundary Isolation
+In multi-monitor configurations where monitors are contiguous or wallpaper is in **Span mode**:
+- Stage Manager preview slots, the Acrylic blur window, and the icon overlay are clamped strictly within `work_area`.
+- Previews implement normalized horizontal cropping (`clip_left_frac` and `clip_right_frac`), ensuring windows sliding off the screen edge crop cleanly without spilling or splitting onto adjacent screens.
+
 ### Display Hotplugging
 When displays are connected, disconnected, or reconfigured:
 1. Windows emits `WM_DISPLAYCHANGE`.

@@ -1,5 +1,31 @@
 # Release Notes — Stage Manager for Windows
 
+## [0.2.0] — Multi-Monitor Span Isolation & Clean Visuals (2026-11-20)
+
+Stage Manager v0.2.0 introduces multi-monitor boundary isolation for wallpaper span setups, removes background tile boxes for clean borderless application icons, and provides automated prerequisite checking in the installer.
+
+---
+
+### Highlights & Fixes
+
+1. **Multi-Monitor Wallpaper Span Boundary Isolation**:
+   - In multi-monitor configurations (especially when Windows wallpaper is set to "Span"), sliding stage ribbons previously moved into coordinates belonging to adjacent monitors.
+   - Preview slots, the Acrylic backdrop blur window, and the icon overlay are now clamped strictly to `self.work_area`.
+   - `ThumbnailLink::update_clipped` now incorporates horizontal normalized clipping (`clip_left_frac` and `clip_right_frac`) alongside vertical clipping, ensuring cards seamlessly crop against the screen edge when hiding or revealing without leaking onto neighboring displays.
+
+2. **Clean Borderless Application Icons**:
+   - Removed the background squircle tile, rim border, and tile shadow box behind icons in the stage view.
+   - Applications now display their pure, high-DPI transparent icons directly on the stage ribbon.
+
+3. **Automated Prerequisites Verification in Installer**:
+   - `StageManagerSetup.exe` verifies that the OS is Windows 10 build 19041+ or Windows 11, that the system architecture is 64-bit (`x86_64`), and that Desktop Window Manager (DWM) composition is enabled.
+   - Supports `--silent` unattended deployment.
+
+4. **Automated Continuous Releases**:
+   - Enhanced CI/CD pipeline builds, tests, packages, and releases updated executables and NuGet packages directly on GitHub.
+
+---
+
 ## [0.1.0] — Initial Public Release (2024-11-12)
 
 Stage Manager for Windows brings the intuitive, visual stage-based multitasking experience of macOS to Windows 10 and Windows 11 as a native, ultra-lightweight Rust application.

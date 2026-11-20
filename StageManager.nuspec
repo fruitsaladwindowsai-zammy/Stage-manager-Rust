@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>StageManager.Windows</id>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <title>Stage Manager for Windows</title>
     <authors>fruitsaladwindowsai-zammy</authors>
     <owners>fruitsaladwindowsai-zammy</owners>
@@ -11,7 +11,7 @@
     <projectUrl>https://github.com/fruitsaladwindowsai-zammy/Stage-manager-Rust</projectUrl>
     <description>A native, lightweight macOS-style Stage Manager for Windows 10 and Windows 11 written in Rust using DWM Thumbnails, Direct2D, and spring physics.</description>
     <summary>Native macOS-style Stage Manager for Windows 10 &amp; 11</summary>
-    <releaseNotes>v0.1.0 Initial release with DWM live previews, spring physics, auto-hide, infinite scroll, group fan-out, multi-monitor support, and virtual desktop isolation.</releaseNotes>
+    <releaseNotes>v0.2.0: Multi-monitor wallpaper span boundary clamping, borderless app icons, automated prerequisites checking and installation in setup installer, automated release pipeline.</releaseNotes>
     <copyright>Copyright (c) 2026</copyright>
     <tags>windows stage-manager multitasking rust dwm direct2d desktop-enhancement</tags>
     <readme>docs\README.md</readme>

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-20
+
+### Added
+- **Automated Prerequisite Verification in Setup Installer**: `StageManagerSetup.exe` automatically checks for Windows 10/11 version, 64-bit architecture, and Desktop Window Manager (DWM) composition before installation, offering interactive or silent (`--silent`) operation.
+- **Automated Multi-Channel Release Pipeline**: Pushes to `master` and version tags automatically compile, test, package NuGet artifacts, and publish GitHub releases with binary assets.
+
+### Fixed
+- **Multi-Monitor Wallpaper Span Mode Boundary Bleed**: Clamped preview slots, Acrylic blur backdrops, and Direct2D icon overlay windows strictly within each monitor's `work_area`. Implemented normalized horizontal cropping (`clip_left_frac` and `clip_right_frac`) in `ThumbnailLink::update_clipped` so cards sliding off-screen or returning never spill across displays in wallpaper span mode.
+- **Pure Borderless Stage Icons**: Removed background squircle tile fill, outer rim border, and tile drop-shadow box from `draw_icon_tile` in `renderer.rs`. Application icons now render crisply with natural alpha without enclosing boxes or borders.
+- **Preview Creation Coordinates**: Created preview slots within the monitor's work area rather than negative coordinates to prevent ghosting on left-aligned secondary monitors.
+
 ## [0.1.0] - 2024-11-12
 
 ### Added

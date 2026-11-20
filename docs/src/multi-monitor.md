@@ -15,7 +15,16 @@ Unlike taskbars that mirror or duplicate cards across screens, Stage Manager imp
 
 ---
 
-## 2. Display Hotplugging
+## 2. Multi-Monitor Span Mode & Boundary Isolation
+
+In multi-monitor setups where Windows displays are placed side-by-side or when the desktop wallpaper is configured in **Span mode**, virtual desktop coordinates are continuous:
+- Stage Manager preview windows, the Acrylic backdrop blur, and the Direct2D icon overlay are clamped strictly to `self.work_area`.
+- When the sidebar slides off-screen or reveals, cards utilize horizontal normalized cropping (`clip_left_frac` and `clip_right_frac`) in addition to vertical bounds cropping.
+- Elements sliding off the screen edge smoothly crop against the monitor boundary and never bleed into or split across adjacent displays.
+
+---
+
+## 3. Display Hotplugging
 
 When displays are connected, disconnected, or reconfigured:
 1. Windows emits `WM_DISPLAYCHANGE`.

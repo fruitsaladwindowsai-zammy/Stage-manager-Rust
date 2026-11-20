@@ -7,7 +7,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://www.microsoft.com/windows"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-blue?style=flat-square&logo=windows" alt="Platform: Windows" /></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Language-Rust-orange?style=flat-square&logo=rust" alt="Language: Rust" /></a>
-  <a href="../../releases/latest"><img src="https://img.shields.io/badge/Release-v0.1.0-blueviolet?style=flat-square" alt="Latest Release" /></a>
+  <a href="../../releases/latest"><img src="https://img.shields.io/badge/Release-v0.2.0-blueviolet?style=flat-square" alt="Latest Release" /></a>
 </p>
 
 <h1 align="center">Stage Manager for Windows</h1>
@@ -86,12 +86,14 @@ cargo build --release --bin StageManagerSetup
 - **Live GPU Window Previews (`DwmRegisterThumbnail`)** — Direct hardware compositing links with rounded corners. Zero CPU screenshot polling.
 - **Auto-Hide & Smooth Spring Physics** — Damped spring physics (`f64`) synced to Windows DWM VSync (`DwmFlush`) for seamless 60Hz and 120Hz high-refresh displays.
 - **macOS Curved Ribbon Wave** — The hovered stage pops forward toward you while neighboring stages bend gently inward.
-- **Grouped App Hover Expansion** — Multi-window applications fan out horizontally on hover with individual Direct2D squircle icons so you can pick any specific window in one click.
+- **Pure Borderless Stage Icons** — Clean, natural application icons rendered directly onto the stage without unwanted boxes, shadows, or borders.
+- **Grouped App Hover Expansion** — Multi-window applications fan out horizontally on hover with individual app icons so you can pick any specific window in one click.
 - **Infinite Carousel Scroll** — Seamlessly scroll through unlimited open applications; hovering the top or bottom edge wraps indefinitely in either direction.
-- **Independent Per-Monitor Strips** — Each connected monitor gets its own independent strip, trigger zone, and DPI scaling, managing only windows on that display. Hotplug display changes are automatically handled.
+- **Multi-Monitor Span Isolation** — Each connected monitor gets its own independent strip, trigger zone, and DPI scaling. Cards, blur layers, and icons are clamped strictly to display boundaries, preventing spillover or splitting in wallpaper span mode.
 - **Virtual Desktop Isolation** — Windows are tracked per Virtual Desktop GUID using `IVirtualDesktopManager`. Switching virtual desktops (`Win + Ctrl + Left/Right`) starts a clean workspace.
 - **System Tray App & Startup Boot** — Lives silently in the notification area with right-click configuration and a toggle for **Run at Windows Startup**.
-- **Tiny Footprint** — Compiles to a self-contained ~540 KB executable using under 20MB of RAM.
+- **Automated Prerequisites Verification** — Standalone installer automatically validates OS version, 64-bit architecture, and DWM composition before installing.
+- **Tiny Footprint** — Compiles to a self-contained ~550 KB executable using under 20MB of RAM.
 
 ---
 

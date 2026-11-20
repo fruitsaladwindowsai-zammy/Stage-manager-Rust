@@ -1,4 +1,13 @@
-# Release Notes (v0.1.0)
+# Release Notes
+
+## [0.2.0] — Multi-Monitor Span Isolation & Clean Visuals (2026-11-20)
+
+- **Multi-Monitor Wallpaper Span Isolation**: Cards, Acrylic backdrop blur, and icon layers are clamped strictly within the active monitor's bounds, eliminating visual bleed or splitting onto neighboring monitors when wallpaper is in span mode.
+- **Pure Borderless Stage Icons**: Removed background squircle tiles, drop shadows, and outer borders from stage icons, rendering clean application icons with natural alpha.
+- **Automated Prerequisite Verification**: Standalone installer checks for 64-bit architecture, Windows 10/11 version, and DWM composition prior to installation.
+- **Continuous Automated Release**: Pipeline automatically triggers tests, builds, and GitHub releases on master pushes.
+
+---
 
 ## [0.1.0] — Initial Public Release (2024-11-12)
 

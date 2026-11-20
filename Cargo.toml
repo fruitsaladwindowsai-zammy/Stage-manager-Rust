@@ -1,6 +1,6 @@
 [package]
 name = "stage_manager"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 default-run = "stage_manager"
 description = "Native Windows Stage Manager in Rust with smooth DWM live thumbnails, per-monitor sidebars, virtual desktop isolation, and spring animations"
