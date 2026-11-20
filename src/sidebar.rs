@@ -671,8 +671,14 @@ impl Sidebar {
     }
 
     fn apply_frame(&mut self) {
-        self.windows_visible_on_screen = true;
         let rev = self.reveal_spring.value.clamp(-0.05, 1.05);
+        if rev <= 0.005 && !self.revealed {
+            if self.windows_visible_on_screen {
+                self.hide_all_visuals();
+            }
+            return;
+        }
+        self.windows_visible_on_screen = true;
         let dir_sign = match self.config.sidebar_edge {
             SidebarEdge::Left => 1.0,
             SidebarEdge::Right => -1.0,
@@ -806,6 +812,8 @@ impl Sidebar {
 
         struct SlotDraw {
             dest_screen: RECT,
+            clip_left_frac: f64,
+            clip_right_frac: f64,
             clip_top_frac: f64,
             clip_bot_frac: f64,
             opacity: u8,
@@ -816,11 +824,22 @@ impl Sidebar {
         let mut active_keys: HashSet<isize> = HashSet::with_capacity(total_previews);
         for frame in &frames {
             for p in &frame.previews {
-                if p.rect.bottom <= self.work_area.top || p.rect.top >= self.work_area.bottom {
+                // Reject cards entirely outside this monitor's work area to prevent multi-monitor bleed
+                if p.rect.bottom <= self.work_area.top
+                    || p.rect.top >= self.work_area.bottom
+                    || p.rect.right <= self.work_area.left
+                    || p.rect.left >= self.work_area.right
+                {
                     continue;
                 }
 
+                let full_w = (p.rect.right - p.rect.left).max(1) as f64;
                 let full_h = (p.rect.bottom - p.rect.top).max(1) as f64;
+
+                let clip_left_frac =
+                    ((self.work_area.left - p.rect.left).max(0) as f64 / full_w).clamp(0.0, 0.98);
+                let clip_right_frac =
+                    ((p.rect.right - self.work_area.right).max(0) as f64 / full_w).clamp(0.0, 0.98);
                 let clip_top_frac =
                     ((self.work_area.top - p.rect.top).max(0) as f64 / full_h).clamp(0.0, 0.98);
                 let clip_bot_frac = ((p.rect.bottom - self.work_area.bottom).max(0) as f64
@@ -828,12 +847,12 @@ impl Sidebar {
                     .clamp(0.0, 0.98);
 
                 let clipped = RECT {
-                    left: p.rect.left,
+                    left: p.rect.left.max(self.work_area.left),
                     top: p.rect.top.max(self.work_area.top),
-                    right: p.rect.right,
+                    right: p.rect.right.min(self.work_area.right),
                     bottom: p.rect.bottom.min(self.work_area.bottom),
                 };
-                if clipped.bottom - clipped.top < 12 {
+                if clipped.bottom - clipped.top < 12 || clipped.right - clipped.left < 12 {
                     continue;
                 }
 
@@ -845,6 +864,8 @@ impl Sidebar {
                 if active_keys.insert(p.hwnd_key) {
                     active_slots.push(SlotDraw {
                         dest_screen: clipped,
+                        clip_left_frac,
+                        clip_right_frac,
                         clip_top_frac,
                         clip_bot_frac,
                         opacity: p.opacity,
@@ -872,6 +893,8 @@ impl Sidebar {
                             bottom: h,
                         },
                         self.insets_cache.get(&draw.hwnd_key).copied(),
+                        draw.clip_left_frac,
+                        draw.clip_right_frac,
                         draw.clip_top_frac,
                         draw.clip_bot_frac,
                         draw.opacity,
@@ -889,7 +912,11 @@ impl Sidebar {
         let badge_margin = (44.0 * self.dpi_scale).round() as i32;
         for f in &frames {
             let fp = &f.badge.front_preview_rect;
-            if fp.bottom <= self.work_area.top + 16 || fp.top >= self.work_area.bottom - 16 {
+            if fp.bottom <= self.work_area.top + 16
+                || fp.top >= self.work_area.bottom - 16
+                || fp.right <= self.work_area.left
+                || fp.left >= self.work_area.right
+            {
                 continue;
             }
             for (_, r) in &f.badge.expanded_previews {
@@ -900,59 +927,73 @@ impl Sidebar {
         icon_min_x = icon_min_x.max(self.work_area.left);
         icon_max_x = icon_max_x.min(self.work_area.right);
         let icon_x = icon_min_x;
-        let icon_w = (icon_max_x - icon_min_x).max(1);
+        let icon_w = (icon_max_x - icon_min_x).max(0);
         let icon_y = self.work_area.top;
+        let show_icons = icon_w >= 12 && rev > 0.02;
 
-        let local_badges: Vec<AnimatedStageBadge> = frames
-            .iter()
-            .filter(|f| {
-                let fp = &f.badge.front_preview_rect;
-                fp.bottom > self.work_area.top + 16 && fp.top < self.work_area.bottom - 16
-            })
-            .map(|f| {
-                let mut b = f.badge.clone();
-                b.front_preview_rect = RECT {
-                    left: b.front_preview_rect.left - icon_x,
-                    top: b.front_preview_rect.top - icon_y,
-                    right: b.front_preview_rect.right - icon_x,
-                    bottom: b.front_preview_rect.bottom - icon_y,
-                };
-                for (_, rect) in &mut b.expanded_previews {
-                    *rect = RECT {
-                        left: rect.left - icon_x,
-                        top: rect.top - icon_y,
-                        right: rect.right - icon_x,
-                        bottom: rect.bottom - icon_y,
+        if show_icons {
+            let local_badges: Vec<AnimatedStageBadge> = frames
+                .iter()
+                .filter(|f| {
+                    let fp = &f.badge.front_preview_rect;
+                    fp.bottom > self.work_area.top + 16
+                        && fp.top < self.work_area.bottom - 16
+                        && fp.right > self.work_area.left
+                        && fp.left < self.work_area.right
+                })
+                .map(|f| {
+                    let mut b = f.badge.clone();
+                    b.front_preview_rect = RECT {
+                        left: b.front_preview_rect.left - icon_x,
+                        top: b.front_preview_rect.top - icon_y,
+                        right: b.front_preview_rect.right - icon_x,
+                        bottom: b.front_preview_rect.bottom - icon_y,
                     };
-                }
-                b
-            })
-            .collect();
+                    for (_, rect) in &mut b.expanded_previews {
+                        *rect = RECT {
+                            left: rect.left - icon_x,
+                            top: rect.top - icon_y,
+                            right: rect.right - icon_x,
+                            bottom: rect.bottom - icon_y,
+                        };
+                    }
+                    b
+                })
+                .collect();
 
-        unsafe {
-            if !IsWindowVisible(self.icon_hwnd).as_bool() {
-                let _ = ShowWindow(self.icon_hwnd, SW_SHOWNOACTIVATE);
+            unsafe {
+                if !IsWindowVisible(self.icon_hwnd).as_bool() {
+                    let _ = ShowWindow(self.icon_hwnd, SW_SHOWNOACTIVATE);
+                }
+            }
+            self.icon_renderer.render_layered(
+                self.icon_hwnd,
+                icon_x,
+                icon_y,
+                icon_w,
+                self.work_height,
+                self.dpi_scale,
+                self.config.sidebar_edge,
+                &local_badges,
+            );
+        } else {
+            unsafe {
+                let _ = ShowWindow(self.icon_hwnd, SW_HIDE);
             }
         }
-        self.icon_renderer.render_layered(
-            self.icon_hwnd,
-            icon_x,
-            icon_y,
-            icon_w,
-            self.work_height,
-            self.dpi_scale,
-            self.config.sidebar_edge,
-            &local_badges,
-        );
 
         let blur_pad = (10.0 * self.dpi_scale).round() as i32;
-        let blur_shown_x = match self.config.sidebar_edge {
+        let raw_blur_x = match self.config.sidebar_edge {
             SidebarEdge::Left => self.work_area.left + blur_pad + slide_offset_x,
             SidebarEdge::Right => {
                 self.work_area.right - self.strip_width - blur_pad + slide_offset_x
             }
         };
+        let blur_left = raw_blur_x.max(self.work_area.left);
+        let blur_right = (raw_blur_x + self.strip_width).min(self.work_area.right);
+        let blur_w = (blur_right - blur_left).max(0);
         let blur_h = (self.work_height - 2 * blur_pad).max(160);
+        let show_blur = self.config.blur_backdrop && blur_w >= 12 && rev > 0.02;
 
         let unused_count = self.preview_slots.len().saturating_sub(active_keys.len());
         let total_defer = 2 + active_slots.len() + unused_count;
@@ -961,15 +1002,20 @@ impl Sidebar {
             if let Ok(mut hdwp) = BeginDeferWindowPos(total_defer as i32) {
                 let mut insert_after = HWND_TOPMOST;
 
+                let icon_flags = if show_icons {
+                    SWP_NOACTIVATE | SWP_SHOWWINDOW
+                } else {
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW
+                };
                 if let Ok(next) = DeferWindowPos(
                     hdwp,
                     self.icon_hwnd,
                     insert_after,
                     icon_x,
                     icon_y,
-                    icon_w,
+                    icon_w.max(1),
                     self.work_height,
-                    SWP_NOACTIVATE | SWP_SHOWWINDOW,
+                    icon_flags,
                 ) {
                     hdwp = next;
                     insert_after = self.icon_hwnd;
@@ -1019,7 +1065,7 @@ impl Sidebar {
                     }
                 }
 
-                let blur_flags = if self.config.blur_backdrop {
+                let blur_flags = if show_blur {
                     SWP_NOACTIVATE | SWP_SHOWWINDOW
                 } else {
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_HIDEWINDOW
@@ -1028,9 +1074,9 @@ impl Sidebar {
                     hdwp,
                     self.blur_hwnd,
                     insert_after,
-                    blur_shown_x,
+                    blur_left,
                     self.work_area.top + blur_pad,
-                    self.strip_width,
+                    blur_w.max(1),
                     blur_h,
                     blur_flags,
                 ) {
@@ -1051,8 +1097,8 @@ impl Sidebar {
                 PCWSTR(self.preview_class.as_ptr()),
                 PCWSTR(wide("Stage Preview").as_ptr()),
                 WS_POPUP,
-                -400,
-                0,
+                self.work_area.left,
+                self.work_area.top,
                 160,
                 100,
                 None,
@@ -1108,11 +1154,10 @@ fn distinct_app_icons(windows: &[isize], exe_map: &HashMap<isize, String>) -> Ve
     out
 }
 
-fn hidden_blur_x(config: &Config, work_area: &RECT, strip_w: i32, dpi_scale: f64) -> i32 {
-    let pad = (32.0 * dpi_scale).round() as i32;
+fn hidden_blur_x(config: &Config, work_area: &RECT, strip_w: i32, _dpi_scale: f64) -> i32 {
     match config.sidebar_edge {
-        SidebarEdge::Left => work_area.left - strip_w - pad,
-        SidebarEdge::Right => work_area.right + pad,
+        SidebarEdge::Left => work_area.left,
+        SidebarEdge::Right => work_area.right - strip_w,
     }
 }
 

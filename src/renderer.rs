@@ -285,48 +285,16 @@ impl IconOverlayRenderer {
         x: f32,
         base_y: f32,
         sz: f32,
-        r: f32,
-        icon_pad: f32,
+        _r: f32,
+        _icon_pad: f32,
         alpha: f32,
     ) {
-        let sh_rr = D2D1_ROUNDED_RECT {
-            rect: D2D_RECT_F {
-                left: x - 1.0,
-                top: base_y + 2.0,
-                right: x + sz + 1.0,
-                bottom: base_y + sz + 3.5,
-            },
-            radiusX: r + 1.0,
-            radiusY: r + 1.0,
-        };
-        if let Ok(sh) = self.brush(0.0, 0.0, 0.0, 0.34 * alpha) {
-            self.dc_target.FillRoundedRectangle(&sh_rr, &sh);
-        }
-
-        let tile_rr = D2D1_ROUNDED_RECT {
-            rect: D2D_RECT_F {
+        if let Some(Some(bmp)) = self.icon_cache.get(&hk) {
+            let icon_rect = D2D_RECT_F {
                 left: x,
                 top: base_y,
                 right: x + sz,
                 bottom: base_y + sz,
-            },
-            radiusX: r,
-            radiusY: r,
-        };
-        if let Ok(tile_bg) = self.brush(0.95, 0.96, 0.98, 0.92 * alpha) {
-            self.dc_target.FillRoundedRectangle(&tile_rr, &tile_bg);
-        }
-        if let Ok(rim) = self.brush(1.0, 1.0, 1.0, 0.65 * alpha) {
-            self.dc_target
-                .DrawRoundedRectangle(&tile_rr, &rim, 1.0, None);
-        }
-
-        if let Some(Some(bmp)) = self.icon_cache.get(&hk) {
-            let icon_rect = D2D_RECT_F {
-                left: x + icon_pad,
-                top: base_y + icon_pad,
-                right: x + sz - icon_pad,
-                bottom: base_y + sz - icon_pad,
             };
             self.dc_target.DrawBitmap(
                 bmp,

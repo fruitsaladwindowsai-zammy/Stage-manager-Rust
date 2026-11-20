@@ -38,15 +38,20 @@ impl ThumbnailLink {
         opacity: u8,
         visible: bool,
     ) -> windows::core::Result<()> {
-        self.update_clipped(dest_rect, insets, 0.0, 0.0, opacity, visible)
+        self.update_clipped(dest_rect, insets, 0.0, 0.0, 0.0, 0.0, opacity, visible)
     }
 
-    /// Update with optional normalized vertical clipping (`clip_top_frac`, `clip_bot_frac` in 0..1)
-    /// so thumbnails scrolling past the screen/taskbar boundary clip smoothly without squishing.
+    /// Update with optional normalized horizontal & vertical clipping
+    /// (`clip_left_frac`, `clip_right_frac`, `clip_top_frac`, `clip_bot_frac` in 0..1)
+    /// so thumbnails sliding or scrolling past the monitor work area clip smoothly
+    /// without bleeding onto adjacent monitors or squishing.
+    #[allow(clippy::too_many_arguments)]
     pub fn update_clipped(
         &self,
         dest_rect: RECT,
         insets: Option<FrameInsets>,
+        clip_left_frac: f64,
+        clip_right_frac: f64,
         clip_top_frac: f64,
         clip_bot_frac: f64,
         opacity: u8,
@@ -61,18 +66,21 @@ impl ThumbnailLink {
         if let Ok((src_w, src_h)) = self.source_size() {
             if src_w > 16 && src_h > 16 {
                 let ins = insets.unwrap_or_default();
-                let l = ins.left.max(0);
+                let base_l = ins.left.max(0);
                 let base_t = ins.top.max(0);
-                let r = (src_w - ins.right.max(0)).max(l + 1);
+                let base_r = (src_w - ins.right.max(0)).max(base_l + 1);
                 let base_b = (src_h - ins.bottom.max(0)).max(base_t + 1);
+                let span_w = (base_r - base_l) as f64;
                 let span_h = (base_b - base_t) as f64;
+                let cl = base_l + (clip_left_frac.clamp(0.0, 0.98) * span_w).round() as i32;
+                let cr = base_r - (clip_right_frac.clamp(0.0, 0.98) * span_w).round() as i32;
                 let ct = base_t + (clip_top_frac.clamp(0.0, 0.98) * span_h).round() as i32;
                 let cb = base_b - (clip_bot_frac.clamp(0.0, 0.98) * span_h).round() as i32;
-                if r > l && cb > ct {
+                if cr > cl && cb > ct {
                     rc_source = RECT {
-                        left: l,
+                        left: cl,
                         top: ct,
-                        right: r,
+                        right: cr,
                         bottom: cb,
                     };
                     flags |= DWM_TNP_RECTSOURCE;
