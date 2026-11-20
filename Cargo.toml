@@ -17,7 +17,7 @@ path = "src/bin/setup.rs"
 log = "0.4"
 
 [dependencies.windows]
-version = "0.58"
+version = "0.62"
 features = [
     "Foundation_Numerics",
     "Win32_Foundation",
